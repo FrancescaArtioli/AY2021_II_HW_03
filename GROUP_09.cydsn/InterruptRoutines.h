@@ -9,5 +9,13 @@
  *
  * ========================================
 */
+#ifndef __INTERRUPT_ROUTINES_H__
+    #define __INTERRUPT_ROUTINES_H__
+    
+    #include "project.h"
+    
+    CY_ISR_PROTO(Custom_ISR_TIMER);
+    
+#endif
 
 /* [] END OF FILE */

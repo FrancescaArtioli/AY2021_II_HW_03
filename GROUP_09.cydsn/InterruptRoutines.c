@@ -9,5 +9,15 @@
  *
  * ========================================
 */
+#include "InterruptRoutines.h"
+#include "project.h"
+#include "Timer.h"
+
+CY_ISR(Custom_ISR_TIMER){
+ 
+    Timer_ReadStatusRegister();
+    
+    
+}
 
 /* [] END OF FILE */
