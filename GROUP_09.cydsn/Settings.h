@@ -9,20 +9,19 @@
  *
  * ========================================
 */
-#include "project.h"
-#include "Settings.h"
 
-int main(void)
-{
-    CyGlobalIntEnable; /* Enable global interrupts. */
-
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-    Setting_DefaultValues();
+#ifndef __SETTINGS_H__
+    #define __SETTINGS_H__
     
-    for(;;)
-    {
-        /* Place your application code here. */
-    }
-}
+    #include "project.h"
+    
+    #define SLAVE_BUFFER_SIZE 7
+    #define WHO_AM_I_VALUE 0xBC
+
+    uint8_t slaveBuffer[SLAVE_BUFFER_SIZE];
+    
+    void Setting_DefaultValues();
+    
+#endif
 
 /* [] END OF FILE */
