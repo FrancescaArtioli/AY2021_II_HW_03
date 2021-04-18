@@ -11,27 +11,44 @@
 */
 #include "InterruptRoutines.h"
 #include "project.h"
-#include "Timer.h"
+#include "Settings.h"
 
-extern volatile uint8_t flag_dataRead;
+extern volatile uint8_t flag_readData;
 extern volatile uint8_t flag_sendData;
+extern volatile uint8_t status;
 
 CY_ISR(Custom_ISR_TIMER){
  
     Timer_ReadStatusRegister();
     
     if (count < 5){
-        flag_dataRead = 1; 
+        flag_readData = 1; 
     }else{
-        flag_dataRead = 0;
+        flag_readData = 0;
     }
     
     if (count == 9){
         flag_sendData = 1;
     }
     
-    count++;
-    
+    count++;  
 }
+
+void EZI2C_ISR_ExitCallback(void){
+    uint8_t control_status = slaveBuffer[0] & 0b00000011;
+    if (control_status == 0){
+        status = DEVICE_STOPPED;
+    }
+    else if (control_status == 1){
+        status = CHANNEL_TEMP;
+    }
+    else if (control_status == 2){
+        status = CHANNEL_PHOTORES;
+    }
+    else if (control_status == 3){
+        status = CHANNEL_BOTH;
+    }
+}
+
 
 /* [] END OF FILE */

@@ -15,21 +15,29 @@
 
 int32 value_digit;
 
-volatile uint8_t flag_dataRead;
-volatile uint8_t flag_sendData;
+volatile uint8_t flag_readData = 0;
+volatile uint8_t flag_sendData = 0;
+volatile uint8_t status = 0;
 
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
+    ADC_DelSig_Start();
+    Timer_Start();
+    isr_Timer_StartEx(Custom_ISR_TIMER);
+    EZI2C_Start();
+    
     Setting_DefaultValues();
     
     count = 0;
     
     for(;;)
     {
-        /* Place your application code here. */
+        if (flag_readData == 1){
+          
+        }    
     }
 }
 

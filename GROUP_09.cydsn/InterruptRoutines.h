@@ -14,6 +14,11 @@
     
     #include "project.h"
     
+    #define DEVICE_STOPPED 0
+    #define CHANNEL_TEMP 1
+    #define CHANNEL_PHOTORES 2
+    #define CHANNEL_BOTH 3
+    
     uint8_t count;
     
     CY_ISR_PROTO(Custom_ISR_TIMER);
