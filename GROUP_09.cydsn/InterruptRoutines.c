@@ -14,21 +14,16 @@
 #include "Settings.h"
 
 extern volatile uint8_t flag_readData;
-extern volatile uint8_t flag_sendData;
 extern volatile uint8_t status;
 
 CY_ISR(Custom_ISR_TIMER){
  
     Timer_ReadStatusRegister();
     
-    if (count < 5){
+    if (count <= 4){
         flag_readData = 1; 
     }else{
         flag_readData = 0;
-    }
-    
-    if (count == 9){
-        flag_sendData = 1;
     }
     
     count++;  
