@@ -14,7 +14,10 @@
     
     #include "project.h"
     
+    uint8_t count;
+    
     CY_ISR_PROTO(Custom_ISR_TIMER);
+    
     
 #endif
 

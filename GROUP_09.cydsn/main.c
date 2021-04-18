@@ -11,6 +11,12 @@
 */
 #include "project.h"
 #include "Settings.h"
+#include "InterruptRoutines.h"
+
+int32 value_digit;
+
+volatile uint8_t flag_dataRead;
+volatile uint8_t flag_sendData;
 
 int main(void)
 {
@@ -18,6 +24,8 @@ int main(void)
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     Setting_DefaultValues();
+    
+    count = 0;
     
     for(;;)
     {
