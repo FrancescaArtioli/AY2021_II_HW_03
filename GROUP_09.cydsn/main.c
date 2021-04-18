@@ -13,14 +13,14 @@
 #include "Settings.h"
 #include "InterruptRoutines.h"
 
-#define LED_OFF 0
-#define LED_ON 1
-
 volatile uint8_t flag_readData = 0;
 volatile uint8_t status = 0;
 
 int32 value_digit;
-int32 sum; 
+int32 sum_temp; 
+int32 sum_photores; 
+int32 mean_temp;
+int32 mean_photores;
 
 int main(void)
 {
@@ -36,31 +36,83 @@ int main(void)
     Setting_DefaultValues();
     
     count = 0;
-    sum = 0; // Inizializzazione VALUE DIGIT
+    sum_temp = 0; // Inizializzazione VALUE DIGIT
+    sum_photores = 0;
+    mean_temp = 0;
+    mean_photores = 0;
     
     for(;;)
     {
         if (flag_readData == 1){
-          switch(status){
+        
+            switch(status){
             
-            case DEVICE_STOPPED:
-                Blue_LED_Write(LED_OFF);
-                count = 0;
-            break;
+                case DEVICE_STOPPED:
+                    count = 0;
+                break;
                 
-            case CHANNEL_TEMP:
-                AMux_Select(0);
-                value_digit = ADC_DelSig_Read32();
-                sum = sum + value_digit;
-                flag_readData = 0;
-                if (count == 4){
-                    //Calcola media
-                    //Salva nel registro 8 bit + 8 bit
-                    //Manda dato
-                }
+                case CHANNEL_TEMP:
+                    value_digit = ADC_DelSig_Read32();
+                    if (value_digit < 0) value_digit = 0;
+                    if (value_digit > 65535) value_digit = 65535;
+                    sum_temp = sum_temp + value_digit;
+                    flag_readData = 0;
+                    if (count == 4){
+                        mean_temp = sum_temp/5;
+                        slaveBuffer[3] = mean_temp >> 8;
+                        slaveBuffer[4] = mean_temp & 0xFF;
+                        //Manda dato
+                        //count = 0
+                    }
+                break;
+                
+                case CHANNEL_PHOTORES:;
+                    value_digit = ADC_DelSig_Read32();
+                    if (value_digit < 0) value_digit = 0;
+                    if (value_digit > 65535) value_digit = 65535;
+                    sum_photores = sum_photores + value_digit;
+                    flag_readData = 0;
+                    if (count == 4){
+                        mean_photores = sum_photores/5;
+                        slaveBuffer[5] = mean_photores >> 8;
+                        slaveBuffer[6] = mean_photores & 0xFF;
+                        //Manda dato
+                        //count = 0
+                    }
+                break;
             
+                case CHANNEL_BOTH:
+                    ADC_DelSig_StopConvert();
+                    AMux_Select(0);
+                    ADC_DelSig_StartConvert();
+                    value_digit = ADC_DelSig_Read32();
+                    if (value_digit < 0) value_digit = 0;
+                    if (value_digit > 65535) value_digit = 65535;
+                    sum_temp = sum_temp + value_digit;
+                    
+                    ADC_DelSig_StopConvert();
+                    AMux_Select(1);
+                    ADC_DelSig_StartConvert();
+                    value_digit = ADC_DelSig_Read32();
+                    if (value_digit < 0) value_digit = 0;
+                    if (value_digit > 65535) value_digit = 65535;
+                    sum_photores = sum_photores + value_digit;
+                    
+                    flag_readData = 0;
+                
+                    if (count == 4){
+                        mean_temp = sum_temp/5;
+                        slaveBuffer[3] = mean_temp >> 8;
+                        slaveBuffer[4] = mean_temp & 0xFF;
+                        mean_photores = sum_photores/5;
+                        slaveBuffer[5] = mean_photores >> 8;
+                        slaveBuffer[6] = mean_photores & 0xFF;
+                        //Manda dato
+                        //count = 0
+                    }
+                break;
+            }    
         }
-        }    
     }
 }
 
