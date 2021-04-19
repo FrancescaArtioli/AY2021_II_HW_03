@@ -43,7 +43,7 @@ void EZI2C_ISR_ExitCallback(void){
         status = CHANNEL_TEMP;
         ADC_DelSig_StopConvert();
         AMux_Select(0);
-        ADC_DelSig_StartConvert();
+        ADC_DelSig_StartConvert(); 
         Blue_LED_Write(LED_OFF);
     }
     else if (control_status == 2){
@@ -54,8 +54,8 @@ void EZI2C_ISR_ExitCallback(void){
         Blue_LED_Write(LED_OFF);
     }
     else if (control_status == 3){
-        status = CHANNEL_BOTH;
         Blue_LED_Write(LED_ON);
+        status = CHANNEL_BOTH;
     }
 }
 

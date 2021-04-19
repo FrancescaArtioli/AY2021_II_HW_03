@@ -1,0 +1,18 @@
+; Write Status bit 0: Channel 0
+w 08 00 01 p
+; Write Status bit 1: Channel 1
+w 08 00 02 p
+; Channel 0 + Channel 1
+w 08 00 03 p
+
+; Read Temperature
+w 08 03 p
+r 08 @1Temp p
+w 08 04 p
+r 08 @0Temp p
+
+; Read Photo_Res
+w 08 05 p
+r 08 @1Photo_Res p
+w 08 06 p
+r 08 @0Photo_Res p

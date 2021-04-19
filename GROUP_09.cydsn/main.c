@@ -34,9 +34,9 @@ int main(void)
     isr_Timer_StartEx(Custom_ISR_TIMER);
     EZI2C_Start();
     
-    Setting_DefaultValues(); // Funzione creata da noi 
-    
     EZI2C_SetBuffer1(SLAVE_BUFFER_SIZE, 2, slaveBuffer);
+    
+    Setting_DefaultValues(); // Funzione creata da noi 
     
     count = 0;
     sum_temp = 0; // Inizializzazione VALUE DIGIT
@@ -45,7 +45,7 @@ int main(void)
     mean_photores = 0;
     
     i = 0;
-    
+    ADC_DelSig_StartConvert();
     for(;;)
     {
         if (flag_readData == 1){
@@ -56,7 +56,7 @@ int main(void)
                     count = 0;
                 break;
                 
-                case CHANNEL_TEMP:
+                case CHANNEL_TEMP:   
                     value_digit = ADC_DelSig_Read32();
                     if (value_digit < 0) value_digit = 0;
                     if (value_digit > 65535) value_digit = 65535;
