@@ -22,24 +22,29 @@ int32 sum_photores;
 int32 mean_temp;
 int32 mean_photores;
 
+uint8_t i; 
+
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
 
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     AMux_Start();
     ADC_DelSig_Start();
     Timer_Start();
     isr_Timer_StartEx(Custom_ISR_TIMER);
     EZI2C_Start();
     
-    Setting_DefaultValues();
+    Setting_DefaultValues(); // Funzione creata da noi 
+    
+    EZI2C_SetBuffer1(SLAVE_BUFFER_SIZE, 2, slaveBuffer);
     
     count = 0;
     sum_temp = 0; // Inizializzazione VALUE DIGIT
     sum_photores = 0;
     mean_temp = 0;
     mean_photores = 0;
+    
+    i = 0;
     
     for(;;)
     {
@@ -61,8 +66,7 @@ int main(void)
                         mean_temp = sum_temp/5;
                         slaveBuffer[3] = mean_temp >> 8;
                         slaveBuffer[4] = mean_temp & 0xFF;
-                        //Manda dato
-                        //count = 0
+                        count = 0;
                     }
                 break;
                 
@@ -76,8 +80,7 @@ int main(void)
                         mean_photores = sum_photores/5;
                         slaveBuffer[5] = mean_photores >> 8;
                         slaveBuffer[6] = mean_photores & 0xFF;
-                        //Manda dato
-                        //count = 0
+                        count = 0;
                     }
                 break;
             
@@ -107,8 +110,7 @@ int main(void)
                         mean_photores = sum_photores/5;
                         slaveBuffer[5] = mean_photores >> 8;
                         slaveBuffer[6] = mean_photores & 0xFF;
-                        //Manda dato
-                        //count = 0
+                        count = 0;
                     }
                 break;
             }    

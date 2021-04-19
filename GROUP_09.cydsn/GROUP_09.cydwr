@@ -252,8 +252,10 @@
   <Group key="DWRInstGuidMapping">
     <Group key="Pin">
       <Data key="34cfed22-c960-4363-8ecf-2f6fc0d15200" value="Pin_1" />
+      <Data key="1425177d-0d0e-4468-8bcc-e638e5509a9b" value="Rx" />
       <Data key="77715107-f8d5-47e5-a629-0fb83101ac6b" value="Photo_Res" />
       <Data key="e851a3b9-efb8-48be-bbb8-b303b216c393" value="Blue_LED" />
+      <Data key="ed092b9b-d398-4703-be89-cebf998501f6" value="Tx" />
       <Data key="fb3d4c18-107c-4512-aec6-b8df0f71685a" value="Temp_Sensor" />
     </Group>
   </Group>
@@ -3349,6 +3351,11 @@
         <Data key="Port Format" value="12,1" />
       </Group>
     </Group>
+    <Group key="1425177d-0d0e-4468-8bcc-e638e5509a9b">
+      <Group key="0">
+        <Data key="Port Format" value="12,6" />
+      </Group>
+    </Group>
     <Group key="77715107-f8d5-47e5-a629-0fb83101ac6b">
       <Group key="0">
         <Data key="Port Format" value="2,6" />
@@ -3357,6 +3364,11 @@
     <Group key="e851a3b9-efb8-48be-bbb8-b303b216c393">
       <Group key="0">
         <Data key="Port Format" value="2,1" />
+      </Group>
+    </Group>
+    <Group key="ed092b9b-d398-4703-be89-cebf998501f6">
+      <Group key="0">
+        <Data key="Port Format" value="12,7" />
       </Group>
     </Group>
     <Group key="fb3d4c18-107c-4512-aec6-b8df0f71685a">
