@@ -15,6 +15,9 @@
 
 extern volatile uint8_t flag_readData;
 extern volatile uint8_t status;
+extern volatile int32 value_digit;
+extern volatile int32 sum_temp;
+extern volatile int32 sum_photores;
 
 #define LED_OFF 0
 #define LED_ON 1
@@ -22,14 +25,52 @@ extern volatile uint8_t status;
 CY_ISR(Custom_ISR_TIMER){
  
     Timer_ReadStatusRegister();
+    count++;
     
-    if (count <= 4){
-        flag_readData = 1; 
-    }else{
-        flag_readData = 0;
+    switch(status){
+        
+        case CHANNEL_TEMP:
+            value_digit = ADC_DelSig_Read32();
+            if (value_digit < 0) value_digit = 0;
+            if (value_digit > 65535) value_digit = 65535;
+            sum_temp = sum_temp + value_digit;
+            if(count == 5){
+                flag_readData = 1;
+            }   
+        break;
+            
+        case CHANNEL_PHOTORES:
+            value_digit = ADC_DelSig_Read32();
+            if (value_digit < 0) value_digit = 0;
+            if (value_digit > 65535) value_digit = 65535;
+            sum_photores = sum_photores + value_digit;
+            if(count == 5){
+                flag_readData = 1;
+            }   
+        break;
+        
+        case CHANNEL_BOTH:
+                ADC_DelSig_StopConvert();
+                AMux_FastSelect(0);
+                ADC_DelSig_StartConvert();
+                value_digit = ADC_DelSig_Read32();
+                if (value_digit < 0) value_digit = 0;
+                if (value_digit > 65535) value_digit = 65535;
+                sum_temp = sum_temp + value_digit;
+                
+                ADC_DelSig_StopConvert();
+                AMux_FastSelect(1);
+                ADC_DelSig_StartConvert();
+                value_digit = ADC_DelSig_Read32();
+                if (value_digit < 0) value_digit = 0;
+                if (value_digit > 65535) value_digit = 65535;
+                sum_photores = sum_photores + value_digit;
+                if(count == 5){
+                    flag_readData = 1;
+                }   
+        break;        
     }
-    
-    count++;  
+          
 }
 
 void EZI2C_ISR_ExitCallback(void){
@@ -42,14 +83,14 @@ void EZI2C_ISR_ExitCallback(void){
     else if (control_status == 1){
         status = CHANNEL_TEMP;
         ADC_DelSig_StopConvert();
-        AMux_Select(0);
+        AMux_FastSelect(0);
         ADC_DelSig_StartConvert(); 
         Blue_LED_Write(LED_OFF);
     }
     else if (control_status == 2){
         status = CHANNEL_PHOTORES;
         ADC_DelSig_StopConvert();
-        AMux_Select(1);
+        AMux_FastSelect(1);
         ADC_DelSig_StartConvert();
         Blue_LED_Write(LED_OFF);
     }
