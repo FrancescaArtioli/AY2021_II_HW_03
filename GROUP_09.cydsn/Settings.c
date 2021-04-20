@@ -15,11 +15,11 @@
 
 void Setting_DefaultValues(){
     
-    slaveBuffer[0] |= (1 << 2);
-    slaveBuffer[0] |= (1 << 4);
+    //slaveBuffer[0] |= (1 << 2);
+    //slaveBuffer[0] |= (1 << 4);
+    slaveBuffer[0] = AVERAGED_DATA;
     slaveBuffer[1] = Timer_ReadPeriod();
     slaveBuffer[2] = WHO_AM_I_VALUE;
-    
 }
     
 /* [] END OF FILE */

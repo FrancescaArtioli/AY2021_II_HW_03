@@ -16,9 +16,16 @@
     #include "project.h"
     
     #define SLAVE_BUFFER_SIZE 7
+    #define SLAVE_RW_BOUNDARY 2
+    
     #define WHO_AM_I_VALUE 0xBC
-
-    uint8_t slaveBuffer[SLAVE_BUFFER_SIZE];
+    
+    #define MASK_STATUS 0b00000011
+    #define MASK_SAMPLES 0b00111100
+    
+    #define AVERAGED_DATA 0x14
+    
+    volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE];
     
     void Setting_DefaultValues();
     

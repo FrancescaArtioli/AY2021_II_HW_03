@@ -9,18 +9,19 @@
  *
  * ========================================
 */
+
 #include "InterruptRoutines.h"
 #include "project.h"
 #include "Settings.h"
+#include "ADC_Functions.h"
 
-extern volatile uint8_t flag_readData;
+extern volatile uint8_t flag_sendData;
 extern volatile uint8_t status;
-extern volatile int32 value_digit;
 extern volatile int32 sum_temp;
 extern volatile int32 sum_photores;
 
-#define LED_OFF 0
-#define LED_ON 1
+uint8_t channel;
+
 
 CY_ISR(Custom_ISR_TIMER){
  
@@ -30,43 +31,29 @@ CY_ISR(Custom_ISR_TIMER){
     switch(status){
         
         case CHANNEL_TEMP:
-            value_digit = ADC_DelSig_Read32();
-            if (value_digit < 0) value_digit = 0;
-            if (value_digit > 65535) value_digit = 65535;
-            sum_temp = sum_temp + value_digit;
+            sum_temp += DataRead();
             if(count == 5){
-                flag_readData = 1;
+                flag_sendData = 1;
             }   
         break;
             
         case CHANNEL_PHOTORES:
-            value_digit = ADC_DelSig_Read32();
-            if (value_digit < 0) value_digit = 0;
-            if (value_digit > 65535) value_digit = 65535;
-            sum_photores = sum_photores + value_digit;
+            sum_photores += DataRead();
             if(count == 5){
-                flag_readData = 1;
+                flag_sendData = 1;
             }   
         break;
         
         case CHANNEL_BOTH:
-                ADC_DelSig_StopConvert();
-                AMux_FastSelect(0);
-                ADC_DelSig_StartConvert();
-                value_digit = ADC_DelSig_Read32();
-                if (value_digit < 0) value_digit = 0;
-                if (value_digit > 65535) value_digit = 65535;
-                sum_temp = sum_temp + value_digit;
+                channel = 0;
+                ChannelSelect(channel);
+                sum_temp += DataRead();
                 
-                ADC_DelSig_StopConvert();
-                AMux_FastSelect(1);
-                ADC_DelSig_StartConvert();
-                value_digit = ADC_DelSig_Read32();
-                if (value_digit < 0) value_digit = 0;
-                if (value_digit > 65535) value_digit = 65535;
-                sum_photores = sum_photores + value_digit;
+                channel = 1;
+                ChannelSelect(channel);
+                sum_photores += DataRead();
                 if(count == 5){
-                    flag_readData = 1;
+                    flag_sendData = 1;
                 }   
         break;        
     }
@@ -74,25 +61,23 @@ CY_ISR(Custom_ISR_TIMER){
 }
 
 void EZI2C_ISR_ExitCallback(void){
-    uint8_t control_status = slaveBuffer[0] & 0b00000011;
+    uint8_t control_status = slaveBuffer[0] & MASK_STATUS;
     if (control_status == 0){
-        status = DEVICE_STOPPED;
         ADC_DelSig_StopConvert();
         Blue_LED_Write(LED_OFF);
+        status = DEVICE_STOPPED;
     }
     else if (control_status == 1){
-        status = CHANNEL_TEMP;
-        ADC_DelSig_StopConvert();
-        AMux_FastSelect(0);
-        ADC_DelSig_StartConvert(); 
+        channel = 0;
+        ChannelSelect(channel);
         Blue_LED_Write(LED_OFF);
+        status = CHANNEL_TEMP;
     }
     else if (control_status == 2){
+        channel = 1;
+        ChannelSelect(channel);
+        Blue_LED_Write(LED_OFF);        
         status = CHANNEL_PHOTORES;
-        ADC_DelSig_StopConvert();
-        AMux_FastSelect(1);
-        ADC_DelSig_StartConvert();
-        Blue_LED_Write(LED_OFF);
     }
     else if (control_status == 3){
         Blue_LED_Write(LED_ON);
