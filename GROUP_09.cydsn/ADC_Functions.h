@@ -14,9 +14,9 @@
     
     #include "project.h"
     
-    void ChannelSelect(uint8_t channel);
+    //void ChannelSelect(uint8_t channel);
     
-    int32 DataRead(void);
+    int32 DataRead(uint8_t channel);
     
 #endif
 

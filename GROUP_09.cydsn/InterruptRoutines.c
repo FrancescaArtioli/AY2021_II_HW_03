@@ -31,14 +31,14 @@ CY_ISR(Custom_ISR_TIMER){
     switch(status){
         
         case CHANNEL_TEMP:
-            sum_temp += DataRead();
+            sum_temp += DataRead(channel);
             if(count == 5){
                 flag_sendData = 1;
             }   
         break;
             
         case CHANNEL_PHOTORES:
-            sum_photores += DataRead();
+            sum_photores += DataRead(channel);
             if(count == 5){
                 flag_sendData = 1;
             }   
@@ -46,12 +46,10 @@ CY_ISR(Custom_ISR_TIMER){
         
         case CHANNEL_BOTH:
                 channel = 0;
-                ChannelSelect(channel);
-                sum_temp += DataRead();
+                sum_temp += DataRead(channel);
                 
                 channel = 1;
-                ChannelSelect(channel);
-                sum_photores += DataRead();
+                sum_photores += DataRead(channel);
                 if(count == 5){
                     flag_sendData = 1;
                 }   
@@ -69,13 +67,11 @@ void EZI2C_ISR_ExitCallback(void){
     }
     else if (control_status == 1){
         channel = 0;
-        ChannelSelect(channel);
         Blue_LED_Write(LED_OFF);
         status = CHANNEL_TEMP;
     }
     else if (control_status == 2){
         channel = 1;
-        ChannelSelect(channel);
         Blue_LED_Write(LED_OFF);        
         status = CHANNEL_PHOTORES;
     }
