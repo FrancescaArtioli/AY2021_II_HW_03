@@ -14,6 +14,7 @@
 
 
 int32 value_digit;
+int32 value_mv;
 
 // Channel selection for Amux
 //void ChannelSelect(uint8_t channel){
@@ -29,7 +30,8 @@ int32 value_digit;
     value_digit = ADC_DelSig_Read32();
     if (value_digit < 0) value_digit = 0;
     if (value_digit > 65535) value_digit = 65535;
-    return  value_digit;
+    value_mv = ADC_DelSig_CountsTo_mVolts(value_digit);
+    return  value_mv;
 }
 
 /* [] END OF FILE */
