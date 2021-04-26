@@ -1,12 +1,5 @@
 /* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * \file ADC_Functions.h
  * ========================================
 */
 #ifndef __ADC_FUNCTIONS_H__

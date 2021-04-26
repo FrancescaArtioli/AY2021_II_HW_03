@@ -1,12 +1,5 @@
 /* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * \file InterruptRoutines.h
  * ========================================
 */
 
@@ -35,9 +28,12 @@
     #define MASK_INIT 0b11000000
     #define DEFAULT_VALUE 0x00
     
+    #define PERIOD_ADJ 2
+    
     volatile uint8_t count;
     
     void Reset_Timer(uint8_t period);
+    void Reset_Variables();
     
     CY_ISR_PROTO(Custom_ISR_TIMER);
     

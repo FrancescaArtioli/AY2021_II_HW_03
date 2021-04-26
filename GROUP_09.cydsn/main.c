@@ -31,8 +31,8 @@ volatile uint8_t NumSamples = 0;
 // Slave Buffer Initialization, default values are 0
 volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE]; 
 
-int32 mean_temp = 0;
-int32 mean_photores = 0;
+int16 mean_temp = 0;
+int16 mean_photores = 0;
 
 int main(void)
 {
@@ -60,7 +60,8 @@ int main(void)
     slaveBuffer[6] = DEFAULT_VALUE;
           
     for(;;)
-    {       
+    {   // Depending on the status in which we are, we compute the mean and save it in its proper position in the 
+        // slaveBuffer[]
         switch(status){
         
             case DEVICE_STOPPED:
@@ -70,22 +71,18 @@ int main(void)
             case CHANNEL_TEMP:
                 if(flag_ready == 1){
                     mean_temp = sum_temp/NumSamples;
-                    slaveBuffer[3] = mean_temp >> 8;
-                    slaveBuffer[4] = mean_temp & 0xFF;
-                    sum_temp = 0;
-                    count = 0;
-                    flag_ready = 0;
+                    slaveBuffer[3] = mean_temp >> 8;    //MSB
+                    slaveBuffer[4] = mean_temp & 0xFF;  //LSB
+                    Reset_Variables();
                 }
             break;
             
             case CHANNEL_PHOTORES:
                 if (flag_ready == 1){
                     mean_photores = sum_photores/NumSamples;
-                    slaveBuffer[5] = mean_photores >> 8;
-                    slaveBuffer[6] = mean_photores & 0xFF;
-                    sum_photores = 0;
-                    count = 0;
-                    flag_ready = 0;
+                    slaveBuffer[5] = mean_photores >> 8;   //MSB
+                    slaveBuffer[6] = mean_photores & 0xFF; //LSB
+                    Reset_Variables();
                 }
             break;
         
@@ -94,14 +91,11 @@ int main(void)
                     mean_temp = sum_temp/NumSamples;
                     mean_photores = sum_photores/NumSamples;
                     
-                    slaveBuffer[3] = mean_temp >> 8;
-                    slaveBuffer[4] = mean_temp & 0xFF;
-                    slaveBuffer[5] = mean_photores >> 8;
-                    slaveBuffer[6] = mean_photores & 0xFF;
-                    sum_temp = 0;
-                    sum_photores = 0;
-                    count = 0;
-                    flag_ready = 0;
+                    slaveBuffer[3] = mean_temp >> 8;       //MSB
+                    slaveBuffer[4] = mean_temp & 0xFF;     //LSB
+                    slaveBuffer[5] = mean_photores >> 8;   //MSB
+                    slaveBuffer[6] = mean_photores & 0xFF; //LSB
+                    Reset_Variables();
                 }
             break;
                   

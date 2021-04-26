@@ -1,12 +1,11 @@
 /* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * \file InterruptRoutines.c
+ * In this file we manage: 
+ * -> ISR of the Timer required to sample the analog channels
+ * -> EZI2C_ISR_ExitCallback(): used to control values written by the USER on the BCP
+ * -> Reset_Timer(): when a new period is provided by the USER on the BCP, the function reloads the counter
+ *    and writes the new period
+ * -> Reset_Variables(): resets all the variables of interest
  * ========================================
 */
 
@@ -25,9 +24,13 @@ extern volatile uint8_t Period;
 uint8_t channel;
 
 CY_ISR(Custom_ISR_TIMER){
+    // Read status register to bring the interrupt line low
     Timer_ReadStatusRegister();
+
     count++;
     
+    // As long as count is equal or lower than NumSamples, data are acquired and the sum is computed. When count is 
+    // equal to NumSamples, the flag is risen. 
     if (flag_ready == 0){
         switch(status){
             
@@ -66,6 +69,8 @@ CY_ISR(Custom_ISR_TIMER){
 }
 
 void EZI2C_ISR_ExitCallback(void){
+    // When a new value is detected into the control registers (1 or 2) either we update the status, 
+    // the period or the number of samples for the mean. 
     uint8_t control_status = slaveBuffer[0] & MASK_STATUS;
     if (control_status != status){
         if (control_status == 0){
@@ -97,15 +102,22 @@ void EZI2C_ISR_ExitCallback(void){
     
     if (slaveBuffer[1] != Period){
         Period = slaveBuffer[1];
-        Reset_Timer(Period);    // Aggiorno counter e period
+        Reset_Timer(Period);  
     }   
 }
 
 void Reset_Timer(uint8_t Period){
     Timer_Stop();
-    Timer_WriteCounter(Period - 1);
-    Timer_WritePeriod(Period - 1);
+    Timer_WriteCounter((Period * PERIOD_ADJ) - 1);
+    Timer_WritePeriod((Period * PERIOD_ADJ) - 1);
     Timer_Start();
+}
+
+void Reset_Variables(){
+    sum_temp = 0;
+    sum_photores = 0;
+    count = 0;
+    flag_ready = 0;    
 }
 
 /* [] END OF FILE */
