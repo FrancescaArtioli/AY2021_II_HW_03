@@ -29,7 +29,11 @@
     #define SLAVE_BUFFER_SIZE 7
     #define SLAVE_RW_BOUNDARY 2
     
+    #define WHO_AM_I_VALUE 0xBC  
     #define MASK_STATUS 0b00000011
+    #define MASK_SAMPLES 0b00111100
+    #define MASK_INIT 0b11000000
+    #define DEFAULT_VALUE 0x00
     
     volatile uint8_t count;
     

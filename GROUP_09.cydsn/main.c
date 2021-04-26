@@ -1,51 +1,64 @@
 /* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * Project GROUP_09: ASSIGNMENT 03
+ * 
+ * CODE DESCRIPTION:
+ * The code samples two analog sensors (TMP36 and PHOTORESISTOR) through a Delta-SigmaADC
+ * usign the PSoC as an I2C slave. The USER enters the number of samples (NumSamples) on
+ * which he wants to compute the mean and the period at which he wants to sample the channel.
+ * In this way, the computed mean will be transmitted with a period given by:
+ * Trasmission Period (ms) = NumSamples*Period
+ * The transmission frequency will be known by the USER as:
+ * Transmission rate (Hz) = 1 / Transmission Period (s)
+ * Combining different values of NumSamples and Period, the USER can achieve different transmission
+ * frequencies.
+ * In the files .iic and .ini, we have provided some examples of combinations used to configure the 
+ * two Control Registers.
+ * 
+ * NOTE: 
+ * Authors: Artioli Francesca, Buquicchio Antonella
  * ========================================
 */
 #include "project.h"
 #include "InterruptRoutines.h"
 
-#define WHO_AM_I_VALUE 0xBC
-
 volatile uint8_t Period = 0;
-volatile uint8_t status = 0;
+volatile uint8_t status = DEVICE_STOPPED;
 volatile int32 sum_temp = 0; 
 volatile int32 sum_photores = 0; 
 volatile uint8_t flag_ready = 0;
 volatile uint8_t NumSamples = 0;
-volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE] = {0};
+
+// Slave Buffer Initialization, default values are 0
+volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE]; 
 
 int32 mean_temp = 0;
 int32 mean_photores = 0;
 
-
 int main(void)
 {
-    CyGlobalIntEnable; /* Enable global interrupts. */
+    // Enable global interrupts. 
+    CyGlobalIntEnable; 
     
+    // Start of different peripherals and ISR
     EZI2C_Start();
-    
     AMux_Start();
     ADC_DelSig_Start();
-    
-    // Start Timer gestione ADC
     Timer_Start();
     
     isr_Timer_StartEx(Custom_ISR_TIMER);
     
+    // Set up EZI2C Buffer 
     EZI2C_SetBuffer1(SLAVE_BUFFER_SIZE, SLAVE_RW_BOUNDARY, slaveBuffer);
     
+    // Slave buffer initialization
+    slaveBuffer[0] = slaveBuffer[0] & MASK_INIT;
+    slaveBuffer[1] = DEFAULT_VALUE;
     slaveBuffer[2] = WHO_AM_I_VALUE;
-    
-    Period = slaveBuffer[1];
-       
+    slaveBuffer[3] = DEFAULT_VALUE;
+    slaveBuffer[4] = DEFAULT_VALUE;
+    slaveBuffer[5] = DEFAULT_VALUE;
+    slaveBuffer[6] = DEFAULT_VALUE;
+          
     for(;;)
     {       
         switch(status){

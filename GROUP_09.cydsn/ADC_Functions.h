@@ -14,7 +14,7 @@
     
     #include "project.h"
     
-    int32 DataRead(uint8_t channel);
+    int32 DataRead(void);
     
 #endif
 

@@ -18,14 +18,11 @@ extern volatile uint8_t flag_ready;
 extern volatile uint8_t status;
 extern volatile int32 sum_temp;
 extern volatile int32 sum_photores;
-extern volatile uint8_t Period;
 extern volatile uint8_t NumSamples;
 extern volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE];
 extern volatile uint8_t Period;
 
 uint8_t channel;
-uint8_t New_period;
-
 
 CY_ISR(Custom_ISR_TIMER){
     Timer_ReadStatusRegister();
@@ -35,14 +32,14 @@ CY_ISR(Custom_ISR_TIMER){
         switch(status){
             
             case CHANNEL_TEMP: 
-                sum_temp += DataRead(channel);
+                sum_temp += DataRead();
                 if(count == NumSamples){
                     flag_ready = 1;
                 }   
             break;
                 
             case CHANNEL_PHOTORES:
-                sum_photores += DataRead(channel);
+                sum_photores += DataRead();
                 if(count == NumSamples){
                     flag_ready = 1;
                 }   
@@ -50,10 +47,12 @@ CY_ISR(Custom_ISR_TIMER){
             
             case CHANNEL_BOTH:
                     channel = TEMP;
-                    sum_temp += DataRead(channel);
+                    AMux_Select(channel);
+                    sum_temp += DataRead();
                     
                     channel = PHOTORES;
-                    sum_photores += DataRead(channel);
+                    AMux_Select(channel);
+                    sum_photores += DataRead();
                     if(count == NumSamples){
                         flag_ready = 1;
                         
@@ -68,34 +67,36 @@ CY_ISR(Custom_ISR_TIMER){
 
 void EZI2C_ISR_ExitCallback(void){
     uint8_t control_status = slaveBuffer[0] & MASK_STATUS;
-    if (control_status == 0){
-        ADC_DelSig_StopConvert();
-        Blue_LED_Write(LED_OFF);
-        status = DEVICE_STOPPED;
+    if (control_status != status){
+        if (control_status == 0){
+            //ADC_DelSig_StopConvert();
+            Blue_LED_Write(LED_OFF);
+            status = DEVICE_STOPPED;
+        }
+        else if (control_status == 1){
+            channel = TEMP;
+            AMux_Select(channel);
+            Blue_LED_Write(LED_OFF);
+            status = CHANNEL_TEMP;
+        }
+        else if (control_status == 2){
+            channel = PHOTORES;
+            AMux_Select(channel);
+            Blue_LED_Write(LED_OFF);        
+            status = CHANNEL_PHOTORES;
+        }
+        else if (control_status == 3){
+            Blue_LED_Write(LED_ON);
+            status = CHANNEL_BOTH;
+        }
     }
-    else if (control_status == 1){
-        channel = TEMP;
-        Blue_LED_Write(LED_OFF);
-        status = CHANNEL_TEMP;
-    }
-    else if (control_status == 2){
-        channel = PHOTORES;
-        Blue_LED_Write(LED_OFF);        
-        status = CHANNEL_PHOTORES;
-    }
-    else if (control_status == 3){
-        Blue_LED_Write(LED_ON);
-        status = CHANNEL_BOTH;
+       
+    if (((slaveBuffer[0] & MASK_SAMPLES) >> 2) != NumSamples){
+        NumSamples = (slaveBuffer[0] & MASK_SAMPLES) >> 2;
     }
     
-    New_period = slaveBuffer [1];
-    
-    if (slaveBuffer[0] >> 2 != NumSamples){
-        NumSamples = slaveBuffer[0] >> 2;
-    }
-    
-    if (New_period != Period){
-        Period = New_period;
+    if (slaveBuffer[1] != Period){
+        Period = slaveBuffer[1];
         Reset_Timer(Period);    // Aggiorno counter e period
     }   
 }
