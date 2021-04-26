@@ -74,7 +74,6 @@ void EZI2C_ISR_ExitCallback(void){
     uint8_t control_status = slaveBuffer[0] & MASK_STATUS;
     if (control_status != status){
         if (control_status == 0){
-            //ADC_DelSig_StopConvert();
             Blue_LED_Write(LED_OFF);
             status = DEVICE_STOPPED;
         }
@@ -94,22 +93,26 @@ void EZI2C_ISR_ExitCallback(void){
             Blue_LED_Write(LED_ON);
             status = CHANNEL_BOTH;
         }
+        
+        Reset_Variables();    
     }
        
     if (((slaveBuffer[0] & MASK_SAMPLES) >> 2) != NumSamples){
         NumSamples = (slaveBuffer[0] & MASK_SAMPLES) >> 2;
+        Reset_Variables();
     }
     
     if (slaveBuffer[1] != Period){
         Period = slaveBuffer[1];
-        Reset_Timer(Period);  
+        Reset_Timer(Period);
+        Reset_Variables();
     }   
 }
 
 void Reset_Timer(uint8_t Period){
     Timer_Stop();
-    Timer_WriteCounter((Period * PERIOD_ADJ) - 1);
     Timer_WritePeriod((Period * PERIOD_ADJ) - 1);
+    Timer_WriteCounter((Period * PERIOD_ADJ) - 1);
     Timer_Start();
 }
 

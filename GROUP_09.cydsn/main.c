@@ -29,7 +29,7 @@ volatile uint8_t flag_ready = 0;
 volatile uint8_t NumSamples = 0;
 
 // Slave Buffer Initialization, default values are 0
-volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE]; 
+volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE] = {0}; 
 
 int16 mean_temp = 0;
 int16 mean_photores = 0;
@@ -50,14 +50,8 @@ int main(void)
     // Set up EZI2C Buffer 
     EZI2C_SetBuffer1(SLAVE_BUFFER_SIZE, SLAVE_RW_BOUNDARY, slaveBuffer);
     
-    // Slave buffer initialization
-    slaveBuffer[0] = slaveBuffer[0] & MASK_INIT;
-    slaveBuffer[1] = DEFAULT_VALUE;
+    // Slave buffer[2] initialization
     slaveBuffer[2] = WHO_AM_I_VALUE;
-    slaveBuffer[3] = DEFAULT_VALUE;
-    slaveBuffer[4] = DEFAULT_VALUE;
-    slaveBuffer[5] = DEFAULT_VALUE;
-    slaveBuffer[6] = DEFAULT_VALUE;
           
     for(;;)
     {   // Depending on the status in which we are, we compute the mean and save it in its proper position in the 
