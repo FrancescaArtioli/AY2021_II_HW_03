@@ -15,11 +15,11 @@
  * two Control Registers.
  * 
  * NOTES ON BCP:
- * Control_Register_1: Note that the value entered by the USER on the BCP is the number of samples + status,  
+ * -> Control_Register_1: Note that the value entered by the USER on the BCP is the number of samples + status,  
  * which enables the different configurations of the device. 
- * Control_Register_2: The period value entered by the USER on the BCP has to be an integer number in ms. 
+ * -> Control_Register_2: The period value entered by the USER on the BCP has to be an integer number in ms(1-128). 
  * We suggest to set the Scan Period tool with a value equal to the Transmission Period (as above defined). 
- * Some examples are provided in the file .iic: we have provided all the instructions to read all the channels
+ * -> Some examples are provided in the file .iic: we have provided all the instructions to read all the channels
  * (even separately) only for the nominal case. The others examples are provided just for reading both channels.
  *
  * Authors: Artioli Francesca, Buquicchio Antonella
