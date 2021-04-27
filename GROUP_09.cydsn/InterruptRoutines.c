@@ -22,6 +22,7 @@ extern volatile int32 sum_photores;
 extern volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE];
 
 uint8_t channel;
+uint8_t i;
 
 CY_ISR(Custom_ISR_TIMER){
     // Read status register to bring the interrupt line low
@@ -77,6 +78,10 @@ void EZI2C_ISR_ExitCallback(void){
     uint8_t control_status = slaveBuffer[0] & MASK_STATUS; 
     if (control_status != status){
         if (control_status == 0){
+            i = 3;
+            for(i = 3; i < 7; i++){
+                slaveBuffer[i] = 0;
+            }
             Blue_LED_Write(LED_OFF);
             status = DEVICE_STOPPED;
         }
@@ -117,7 +122,7 @@ void EZI2C_ISR_ExitCallback(void){
 void Reset_Timer(uint8_t Period){
     Timer_Stop();
     Timer_WritePeriod((Period * PERIOD_ADJ) - 1);
-    Timer_WriteCounter((Period * PERIOD_ADJ) - 1);
+    Timer_WriteCounter(0);
     Timer_Start();
 }
 

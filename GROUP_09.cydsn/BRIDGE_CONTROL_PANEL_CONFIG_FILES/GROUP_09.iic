@@ -1,17 +1,54 @@
-; Write Control Register 1: 5 SAMPLES + Channel 0 -> TEMPERATURE
- w 08 00 15 p
-; Read Temperature
- w 08 03 p
- r 08 @1Temp @0Temp p
+; NOMINAL FUNCTIONALITY: 5 SAMPLES, 4ms (TRANSMISSION PERIOD 20ms -> 50Hz)
+; Write Control Register 1: 5 SAMPLES + Channel BOTH 
+ w 08 00 17 p        ;0b00010111 -> 0x17
+;w 08 00 16 p        ;ONLY CHANNEL PHOTO_RES
+;w 08 00 15 p        ;ONLY CHANNEL TEMP
+;w 08 00 p           ;To check what is written in the register
+;r 08 x p
+; Write Control Register 2: 4ms
+ w 08 01 04 p        ;0b00000100 -> 0x04
+ w 08 01 p
+ r 08 x p
+; Read Temperature and Photoresistor 
+w 08 03 p
+r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res p 
+;w 08 05 p           ;ONLY CHANNEL PHOTO_RES
+;r 08 @1Photo_Res @0Photo_Res p
+;w 08 03 p           ;ONLY CHANNEL TEMP
+;r 08 @1Temp @0Temp p 
 
-; Write Control Register 1: 5 SAMPLES + Channel 1 ->PHOTORESISTOR
- w 08 00 16 p
-; Read PhotoResistor
- w 08 05 p
- r 08 @1Photo_Res @0Photo_Res p
+;EXAMPLE 1: 10 SAMPLES, 2ms (TRANSMISSION PERIOD 20ms -> 50Hz):CHANNEL BOTH
+w 08 00 2B p
+w 08 01 02 p
+w 08 03 p
+r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res p 
 
-; Write Control Register 1: 5 SAMPLES + Channel 0 + Channel 1
- w 08 00 17 p
-; Read Temperature and Photoresistor
+;EXAMPLE 2: 10 SAMPLES, 10ms (TRANSMISSION PERIOD 100ms -> 10Hz):CHANNEL BOTH
+w 08 00 2B p
+w 08 01 0A p
+w 08 03 p
+r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res p 
+
+;EXAMPLE 3: 5 SAMPLES, 20ms (TRANSMISSION PERIOD 100ms -> 10Hz):CHANNEL BOTH
+w 08 00 17 p
+w 08 01 14 p
 w 08 03 p
 r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res p
+
+;EXAMPLE 4: 5 SAMPLES, 5ms (TRANSMISSION PERIOD 25ms -> 40Hz):CHANNEL BOTH
+w 08 00 17 p
+w 08 01 05 p
+w 08 03 p
+r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res p
+
+;EXAMPLE 5: 2 SAMPLES, 5ms (TRANSMISSION PERIOD 10ms -> 100Hz):CHANNEL BOTH
+w 08 00 0B p
+w 08 01 05 p
+w 08 03 p
+r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res 
+
+;EXAMPLE 6: 10 SAMPLES, 1ms (TRANSMISSION PERIOD 10ms -> 100Hz):CHANNEL BOTH
+w 08 00 2B p
+w 08 01 01 p
+w 08 03 p
+r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res 
