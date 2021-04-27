@@ -13,13 +13,13 @@
 #include "project.h"
 #include "ADC_Functions.h"
 
-extern volatile uint8_t flag_ready;
 extern volatile uint8_t status;
+extern volatile uint8_t Period;
+extern volatile uint8_t NumSamples;
+extern volatile uint8_t flag_ready;
 extern volatile int32 sum_temp;
 extern volatile int32 sum_photores;
-extern volatile uint8_t NumSamples;
 extern volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE];
-extern volatile uint8_t Period;
 
 uint8_t channel;
 
@@ -71,7 +71,10 @@ CY_ISR(Custom_ISR_TIMER){
 void EZI2C_ISR_ExitCallback(void){
     // When a new value is detected into the control registers (1 or 2) either we update the status, 
     // the period or the number of samples for the mean. 
-    uint8_t control_status = slaveBuffer[0] & MASK_STATUS;
+    
+    // In order to ignore the values that do not determine the status, we have used a specific mask defined
+    // in the .h file. 
+    uint8_t control_status = slaveBuffer[0] & MASK_STATUS; 
     if (control_status != status){
         if (control_status == 0){
             Blue_LED_Write(LED_OFF);
@@ -96,7 +99,9 @@ void EZI2C_ISR_ExitCallback(void){
         
         Reset_Variables();    
     }
-       
+      
+    // In order to consider just the bits associated to the number of samples, we have used a specific mask defined
+    // in the .h file. Then, the value is shifted of 2 position (right) to select the correct value. 
     if (((slaveBuffer[0] & MASK_SAMPLES) >> 2) != NumSamples){
         NumSamples = (slaveBuffer[0] & MASK_SAMPLES) >> 2;
         Reset_Variables();

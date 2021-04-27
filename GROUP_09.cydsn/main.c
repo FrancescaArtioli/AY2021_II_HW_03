@@ -14,19 +14,25 @@
  * In the files .iic and .ini, we have provided some examples of combinations used to configure the 
  * two Control Registers.
  * 
- * NOTE: 
+ * NOTES ON BCP:
+ * Control_Register_1: Note that the value entered by the USER on the BCP is the number of samples + status,  
+ * which enables the different configurations of the device. 
+ * Control_Register_2: The period value entered by the USER on the BCP has to be an integer number in ms. 
+ * We suggest to set the Scan Period tool with a value equal to the Transmission Period (as above defined). 
+ * Some examples are provided in the file .iic
+ *
  * Authors: Artioli Francesca, Buquicchio Antonella
  * ========================================
 */
 #include "project.h"
 #include "InterruptRoutines.h"
 
-volatile uint8_t Period = 0;
 volatile uint8_t status = DEVICE_STOPPED;
+volatile uint8_t Period = 0;
+volatile uint8_t NumSamples = 0;
 volatile int32 sum_temp = 0; 
 volatile int32 sum_photores = 0; 
 volatile uint8_t flag_ready = 0;
-volatile uint8_t NumSamples = 0;
 
 // Slave Buffer Initialization, default values are 0
 volatile uint8_t slaveBuffer[SLAVE_BUFFER_SIZE] = {0}; 
