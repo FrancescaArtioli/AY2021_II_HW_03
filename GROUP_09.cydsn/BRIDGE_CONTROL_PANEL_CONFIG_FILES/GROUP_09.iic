@@ -1,0 +1,17 @@
+; Write Control Register 1: 5 SAMPLES + Channel 0 -> TEMPERATURE
+ w 08 00 15 p
+; Read Temperature
+ w 08 03 p
+ r 08 @1Temp @0Temp p
+
+; Write Control Register 1: 5 SAMPLES + Channel 1 ->PHOTORESISTOR
+ w 08 00 16 p
+; Read PhotoResistor
+ w 08 05 p
+ r 08 @1Photo_Res @0Photo_Res p
+
+; Write Control Register 1: 5 SAMPLES + Channel 0 + Channel 1
+ w 08 00 17 p
+; Read Temperature and Photoresistor
+w 08 03 p
+r 08 @1Temp @0Temp @1Photo_Res @0Photo_Res p
